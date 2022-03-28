@@ -38,7 +38,10 @@ return [
             'certificate_path'    => env('TELEGRAM_CERTIFICATE_PATH', 'YOUR-CERTIFICATE-PATH'),
             'webhook_url'         => env('TELEGRAM_WEBHOOK_URL', 'YOUR-BOT-WEBHOOK-URL'),
             'commands'            => [
-                //Acme\Project\Commands\MyTelegramBot\BotCommand::class
+                \App\Telegram\Commands\PingTelegramCommand::class,
+                \App\Telegram\Commands\NewTelegramCommand::class,
+                \App\Telegram\Commands\JoinTelegramCommand::class,
+                \App\Telegram\Commands\StartTelegramCommand::class,
             ],
         ],
 
