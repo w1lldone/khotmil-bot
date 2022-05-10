@@ -3,10 +3,13 @@
 namespace App\Telegram\Commands;
 
 use App\Models\Group;
+use App\Telegram\Messages\KhotmilMessagesTrait;
 use Telegram\Bot\Commands\Command;
 
 class NewTelegramCommand extends Command
 {
+    use KhotmilMessagesTrait;
+
     /**
      * @var string Command Name
      */
@@ -22,31 +25,14 @@ class NewTelegramCommand extends Command
         /** @var Group */
         $group = Group::firstOrCreate(['telegram_chat_id' => $this->update->getMessage()->chat->id], [
             'name' => $this->update->getChat()->title,
-            'duration' => 7
+            'duration' => 7,
+            'timezone' => Group::getDefaultTimezone()
         ]);
 
-        $members = $group->members()->get();
-
-        $formattedMembers = "";
-
-        foreach ($members as $key => $member) {
-            $no = $key+1;
-            $formattedMembers .= "{$no}. $member->name
-";
-        }
-
-        dump($formattedMembers);
-
         $this->replyWithMessage([
-        'text' => "
-*Khotmil Qur'an {$group->name}*
-Durasi: {$group->duration} hari
-
-👥 *ANGGOTA*
-$formattedMembers
-Ketik /join untuk mengikuti khotmil ini
-        ",
-        'parse_mode' => 'Markdown']);
+            'text' => $this->info($group),
+            'parse_mode' => 'Markdown'
+        ]);
 
         return 1;
     }

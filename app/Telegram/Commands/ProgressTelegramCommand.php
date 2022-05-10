@@ -6,19 +6,19 @@ use App\Models\Group;
 use App\Telegram\Messages\KhotmilMessagesTrait;
 use Telegram\Bot\Commands\Command;
 
-class JoinTelegramCommand extends Command
+class ProgressTelegramCommand extends Command
 {
     use KhotmilMessagesTrait;
 
     /**
      * @var string Command Name
      */
-    protected $name = "join";
+    protected $name = "progress";
 
     /**
      * @var string Command Description
      */
-    protected $description = "Join khotmil Quran";
+    protected $description = "Show khotmil progress";
 
     public function handle()
     {
@@ -30,22 +30,20 @@ class JoinTelegramCommand extends Command
                 'parse_mode' => 'Markdown',
                 "text" => $this->notRegistered()
             ]);
+            return 1;
+        }
+
+        if (!$group->started_at) {
+            $this->replyWithMessage([
+                'parse_mode' => 'Markdown',
+                "text" => $this->notStarted()
+            ]);
             return 0;
         }
 
-        $member = $group->members()->firstOrCreate(['telegram_user_id' => $this->update->getMessage()->from->id], [
-            'name' => $this->update->getMessage()->from->firstName,
-            'order' => $group->getLastMemberOrder() + 1
-        ]);
-
         $this->replyWithMessage([
             'parse_mode' => 'Markdown',
-            "text" => "Hai {$member->name}, selamat bergabung. Semoga Allah meridhoi 😊",
-        ]);
-
-        $this->replyWithMessage([
-            'parse_mode' => 'Markdown',
-            'text' => $this->info($group)
+            'text' => $this->progress($group)
         ]);
     }
 }

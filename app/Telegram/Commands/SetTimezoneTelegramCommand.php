@@ -3,29 +3,30 @@
 namespace App\Telegram\Commands;
 
 use App\Models\Group;
+use App\Telegram\Messages\KhotmilMessagesTrait;
 use Telegram\Bot\Commands\Command;
 use Telegram\Bot\Objects\ChatMember;
 use Telegram\Bot\Laravel\Facades\Telegram;
-use App\Telegram\Messages\KhotmilMessagesTrait;
 
-class StartTelegramCommand extends Command
+class SetTimezoneTelegramCommand extends Command
 {
     use KhotmilMessagesTrait;
 
     /**
      * @var string Command Name
      */
-    protected $name = "start";
+    protected $name = "settimezone";
 
-    /**
-     * @var string Command Description
-     */
-    protected $description = "Start khotmil quran";
+    /** @var string The Telegram command description. */
+    protected $description = "Set timezone";
+
+    /** @var string Command Argument Pattern */
+    protected $pattern = '{timezone}';
 
     public function handle()
     {
         /** @var Group */
-        $group = Group::where('telegram_chat_id', $this->update->getMessage()->chat->id)->with('members')->first();
+        $group = Group::where('telegram_chat_id', $this->update->getMessage()->chat->id)->first();
 
         if (!$group) {
             $this->replyWithMessage([
@@ -48,30 +49,23 @@ class StartTelegramCommand extends Command
             return 0;
         }
 
-        if ($group->started_at) {
+        $timezone = $this->getArguments()['timezone'];
+
+        try {
+            now()->setTimezone($timezone);
+        } catch (\Throwable $th) {
             $this->replyWithMessage([
                 'parse_mode' => 'Markdown',
-                "text" => $this->alreadyStarted()
+                'text' => "Ups! {$timezone} bukan timezone yang valid. Coba lagi ya 😅"
             ]);
             return 0;
         }
 
-        if ($group->members->count() == 0) {
-            $this->replyWithMessage([
-                'parse_mode' => 'Markdown',
-                "text" => $this->hasNoMember()
-            ]);
-            return 0;
-        }
-
-        $group->increaseRound();
-        $group->assignMemberSchedule(now());
-
+        $group->update(['timezone' => $timezone]);
         $this->replyWithMessage([
             'parse_mode' => 'Markdown',
-            'text' => $this->progress($group)
+            'text' => $this->info($group)
         ]);
-
         return 1;
     }
 }

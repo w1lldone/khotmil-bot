@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Events\GroupScheduleUpdated;
+use App\Events\ScheduleUpdated;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -11,7 +13,8 @@ class Group extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
-    protected $dates = ['started_at'];
+    protected $dates = ['started_at', 'deadline'];
+    protected static $defaultTimezone = "Asia/Jakarta";
 
     /**
      * The "booted" method of the model.
@@ -51,14 +54,11 @@ class Group extends Model
             $startedAt = now();
         }
 
-        $this->update(['started_at' => $startedAt, 'deadline' => $startedAt->copy()->addDays($this->duration)]);
+        $startedAt->setTimezone($this->timezone)->setTime(0,0)->setTimezone(config('app.timezone'));
 
-        $members = $this->members()->orderByDesc('order')->get();
-        $schedules = $this->schedules()->whereNull('started_at')->orderBy('juz')->take($members->count())->get();
+        $this->update(['started_at' => $startedAt, 'deadline' => $startedAt->copy()->addDays($this->duration-1)]);
 
-        foreach ($schedules as $key => $schedule) {
-            $schedule->update(['member_id' => $members[$key]->id, 'started_at' => $this->started_at, 'deadline' => $this->deadline]);
-        }
+        event(new GroupScheduleUpdated($this));
     }
 
     public function getLastMemberOrder()
@@ -80,6 +80,18 @@ class Group extends Model
         return $this->round;
     }
 
+    public function resetMemberOrder()
+    {
+        $members = $this->members()->orderBy('order')->get();
+
+        foreach ($members as $key => $member) {
+            $member->order += 1;
+            if ($member->order > $members->count()) {
+                $member->order -= $members->count();
+            }
+            $member->save();
+        }
+    }
 
     public function finishedIcon()
     {
@@ -89,5 +101,10 @@ class Group extends Model
     public function onProgressIcon()
     {
         return "⭐";
+    }
+
+    public static function getDefaultTimezone()
+    {
+        return self::$defaultTimezone;
     }
 }

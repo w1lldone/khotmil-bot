@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Group;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class GroupFactory extends Factory
@@ -20,6 +21,7 @@ class GroupFactory extends Factory
             'duration' => $this->faker->numberBetween(5,14),
             'started_at' => now(),
             'deadline' => now()->addDays(7),
+            'timezone' => Group::getDefaultTimezone(),
         ];
     }
 }

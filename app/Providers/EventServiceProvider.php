@@ -18,6 +18,11 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+
+        \App\Events\GroupScheduleUpdated::class => [
+            \App\Listeners\AssignMemberSchedule::class,
+            \App\Listeners\DispatchDeadlineReminder::class
+        ]
     ];
 
     /**

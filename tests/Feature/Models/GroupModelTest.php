@@ -3,8 +3,10 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Group;
+use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Queue;
 use Tests\TestCase;
 
 class GroupModelTest extends TestCase
@@ -59,6 +61,8 @@ class GroupModelTest extends TestCase
     /** @test */
     public function it_can_assign_schedules()
     {
+        Queue::fake();
+
         /** @var Group */
         $group = Group::factory()->create();
         \App\Models\Member::factory()->create([
@@ -73,5 +77,22 @@ class GroupModelTest extends TestCase
         $group->assignMemberSchedule(now());
 
         $this->assertEquals(2, $group->schedules()->whereNotNull('member_id')->count());
+        Queue::assertPushed(\App\Jobs\SendDeadlineReminder::class);
+    }
+
+    /** @test */
+    public function it_can_reorder_members()
+    {
+        /** @var Group */
+        $group = Group::factory()->create();
+        $memberOne = Member::factory()->create(['group_id' => $group->id, 'order' => 1]);
+        $memberTwo = Member::factory()->create(['group_id' => $group->id, 'order' => 2]);
+        $memberThree = Member::factory()->create(['group_id' => $group->id, 'order' => 3]);
+
+        $group->resetMemberOrder();
+
+        $this->assertEquals(2, $memberOne->fresh()->order);
+        $this->assertEquals(3, $memberTwo->fresh()->order);
+        $this->assertEquals(1, $memberThree->fresh()->order);
     }
 }

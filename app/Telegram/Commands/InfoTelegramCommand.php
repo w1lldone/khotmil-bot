@@ -6,24 +6,27 @@ use App\Models\Group;
 use App\Telegram\Messages\KhotmilMessagesTrait;
 use Telegram\Bot\Commands\Command;
 
-class JoinTelegramCommand extends Command
+class InfoTelegramCommand extends Command
 {
     use KhotmilMessagesTrait;
 
     /**
      * @var string Command Name
      */
-    protected $name = "join";
+    protected $name = "info";
 
     /**
      * @var string Command Description
      */
-    protected $description = "Join khotmil Quran";
+    protected $description = "Show khotmil information";
 
     public function handle()
     {
         /** @var Group */
-        $group = Group::where('telegram_chat_id', $this->update->getMessage()->chat->id)->first();
+        $group = Group::where('telegram_chat_id', $this->update->getMessage()->chat->id)->with(['members' => function ($members)
+        {
+            $members->orderBy('order');
+        }])->first();
 
         if (!$group) {
             $this->replyWithMessage([
@@ -32,16 +35,6 @@ class JoinTelegramCommand extends Command
             ]);
             return 0;
         }
-
-        $member = $group->members()->firstOrCreate(['telegram_user_id' => $this->update->getMessage()->from->id], [
-            'name' => $this->update->getMessage()->from->firstName,
-            'order' => $group->getLastMemberOrder() + 1
-        ]);
-
-        $this->replyWithMessage([
-            'parse_mode' => 'Markdown',
-            "text" => "Hai {$member->name}, selamat bergabung. Semoga Allah meridhoi 😊",
-        ]);
 
         $this->replyWithMessage([
             'parse_mode' => 'Markdown',

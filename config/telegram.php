@@ -33,15 +33,19 @@ return [
     */
     'bots'                         => [
         'mybot' => [
-            'username'            => 'khotmil_dev_bot',
+            'username'            => env('TELEGRAM_BOT_USERNAME', null),
             'token'               => env('TELEGRAM_BOT_TOKEN', 'YOUR-BOT-TOKEN'),
             'certificate_path'    => env('TELEGRAM_CERTIFICATE_PATH', 'YOUR-CERTIFICATE-PATH'),
             'webhook_url'         => env('TELEGRAM_WEBHOOK_URL', 'YOUR-BOT-WEBHOOK-URL'),
             'commands'            => [
-                \App\Telegram\Commands\PingTelegramCommand::class,
                 \App\Telegram\Commands\NewTelegramCommand::class,
                 \App\Telegram\Commands\JoinTelegramCommand::class,
                 \App\Telegram\Commands\StartTelegramCommand::class,
+                \App\Telegram\Commands\ProgressTelegramCommand::class,
+                \App\Telegram\Commands\InfoTelegramCommand::class,
+                \App\Telegram\Commands\FinishTelegramCommand::class,
+                \App\Telegram\Commands\ResetTelegramCommand::class,
+                \App\Telegram\Commands\SetTimezoneTelegramCommand::class,
             ],
         ],
 
@@ -121,6 +125,7 @@ return [
     |
     */
     'commands'                     => [
+        \App\Telegram\Commands\PingTelegramCommand::class,
         Telegram\Bot\Commands\HelpCommand::class,
     ],
 

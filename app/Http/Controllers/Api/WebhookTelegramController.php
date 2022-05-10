@@ -15,9 +15,13 @@ class WebhookTelegramController extends Controller
             return abort(403, 'Unauthorized');
         }
 
-        /** @var Update */
-        $update = Telegram::commandsHandler(true);
-        dump($update);
+        try {
+            /** @var Update */
+            $update = Telegram::commandsHandler(true);
+            dump($update);
+        } catch (\Throwable $th) {
+            dump($th);
+        }
         return;
     }
 }

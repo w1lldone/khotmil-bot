@@ -21,6 +21,7 @@ class CreateGroupsTable extends Migration
             $table->integer('duration')->nullable();
             $table->timestamp('started_at')->nullable();
             $table->timestamp('deadline')->nullable();
+            $table->string('timezone')->nullable();
             $table->timestamps();
         });
     }
