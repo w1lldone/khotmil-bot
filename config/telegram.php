@@ -90,9 +90,7 @@ return [
     | Default: GuzzlePHP
     |
     */
-    'http_client_handler' => new \Telegram\Bot\HttpClients\GuzzleHttpClient(new \GuzzleHttp\Client([
-        'base_uri' => env('TELEGRAM_BOT_URL'),
-    ])),
+    'http_client_handler' => null,
 
     /*
     |--------------------------------------------------------------------------
