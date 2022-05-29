@@ -91,7 +91,9 @@ return [
     |
     */
     'http_client_handler' => null,
-
+    // 'http_client_handler' => new \Telegram\Bot\HttpClients\GuzzleHttpClient(new \GuzzleHttp\Client([
+    //     'base_uri' => env('TELEGRAM_BOT_URL'),
+    // ])),
     /*
     |--------------------------------------------------------------------------
     | Resolve Injected Dependencies in commands [Optional]
@@ -185,8 +187,7 @@ return [
                 'status', // Shared Command Name.
                 'Acme\Project\Commands\BotCommand' // Full Path to Command Class.
            ],
-        */
-    ],
+        */],
 
     /*
     |--------------------------------------------------------------------------
