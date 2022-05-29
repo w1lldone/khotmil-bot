@@ -41,7 +41,7 @@ class SendDeadlineReminder implements ShouldQueue
             return;
         }
 
-        $message = "Wah, Khotmil Quran sudah deadline, nih!
+        $message = "Assalamualaikum. Khotmil Quran sudah deadline, nih!
 
 ";
         $message .= $this->remainingSchedules($schedules);
@@ -49,11 +49,14 @@ class SendDeadlineReminder implements ShouldQueue
         $message .= "
 Semoga Allah meridhoi. Aaamiin 🤲";
 
-        Telegram::sendMessage([
-            'chat_id' => $this->group->telegram_chat_id,
-            'parse_mode' => "Markdown",
-            'text' => $message
-        ]);
+        try {
+            Telegram::sendMessage([
+                'chat_id' => $this->group->telegram_chat_id,
+                'parse_mode' => "Markdown",
+                'text' => $message
+            ]);
+        } catch (\Throwable $th) {
+        }
 
         SendDeadlineReminder::dispatch($this->group, now()->addDay()->toDateTimeString());
     }
