@@ -58,6 +58,6 @@ Semoga Allah meridhoi. Aaamiin 🤲";
         } catch (\Throwable $th) {
         }
 
-        SendDeadlineReminder::dispatch($this->group, now()->addDay()->toDateTimeString());
+        SendDeadlineReminder::dispatch($this->group)->delay(now()->addDay()->toDateTimeString());
     }
 }
