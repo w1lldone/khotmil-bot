@@ -59,5 +59,7 @@ Semoga Allah meridhoi. Aaamiin 🤲";
         }
 
         SendDeadlineReminder::dispatch($this->group)->delay(now()->addDay()->toDateTimeString());
+
+        return;
     }
 }
