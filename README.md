@@ -2,7 +2,7 @@
 Khotmil bot is an Telegram Bot Application developed using Laravel. This bot can help you managing khotmil Quran for your family.
 
 # Development
-- Build using Laravel 8
+- Built using Laravel 8
 - Telegram Bot SDK https://telegram-bot-sdk.readme.io/docs
 
 # Available Commands
